@@ -1,0 +1,38 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Blogger Website</title>
+    <link
+      href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
+      rel="stylesheet"
+    />
+  </head>
+  <body>
+    <h1 class="text-5xl">Blog Website</h1>
+
+    <button class="bg-gray-500 p-2 rounded-sm mt-4 mx-2" id="sign-out">
+      Sign Out
+    </button>
+
+    <script type="module">
+      import { auth, signOut } from "./firebase.mjs";
+      let signOutButton = document.getElementById("sign-out");
+      signOutButton.addEventListener("click", () => {
+        signOut(auth)
+          .then(() => {
+            // Sign-out successful.
+            alert("Signed Out");
+            window.location.href = "index.html";
+
+          })
+          .catch((error) => {
+            // An error happened.
+            alert(error);
+          });
+      });
+    </script>
+    <script src="index.js"></script>
+  </body>
+</html>
