@@ -8,31 +8,174 @@
       href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css"
       rel="stylesheet"
     />
+    <link rel="stylesheet" href="style.css" />
   </head>
   <body>
-    <h1 class="text-5xl">Blog Website</h1>
+    <div class="flex justify-between">
+      <h1 class="text-5xl p-2">Blogger</h1>
 
-    <button class="bg-gray-500 p-2 rounded-sm mt-4 mx-2" id="sign-out">
-      Sign Out
-    </button>
+      <button
+        class="bg-blue-500 p-3 rounded-sm mt-4 mx-2 tracking-widest text-sm font-semibold text-white"
+        id="sign-out"
+      >
+        Sign Out
+      </button>
+    </div>
 
+    <div class="flex flex-col items-center mt-32">
+      <h1 class="text-5xl tracking-widest text-cyan-700">
+        Publish your passion, your way
+      </h1>
+      <h3 class="text-2xl font-semi mt-6 tracking-wide">
+        Create a unique and beautiful blog easily.
+      </h3>
+    </div>
+
+    <div class="flex flex-col items-center mt-16">
+      <button class="bg-blue-400 p-4 tracking-wide size" id="blog-create">
+        Create Blog
+      </button>
+    </div>
+
+    <div class="relative">
+      <div class="absolute left-0 -bottom-32">
+        <img src="2.png" class="object-contain" width="350" />
+      </div>
+
+      <div class="absolute right-0 top-10 z-20">
+        <img src="1.png" class="object-contain" width="200" />
+      </div>
+      <div class="absolute right-32 top-16" style="transform: rotate(180deg)">
+        <img src="3.png" class="object-contain" width="200" />
+      </div>
+      <div
+        class="absolute right-10 -bottom-16 z-20"
+        style="transform: rotate(180deg)"
+      >
+        <img src="4.png" class="object-contain" width="70" />
+      </div>
+    </div>
+
+    <!-- Modal -->
+    <div
+      id="create-blog-modal"
+      class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden"
+    >
+      <div class="bg-white p-6 rounded-lg w-11/12 md:w-1/2">
+        <h2 class="text-2xl font-semibold mb-4">Create a New Blog Post</h2>
+        <form id="blog-form">
+          <div class="mb-4">
+            <label for="title" class="block text-sm font-semibold mb-2"
+              >Title</label
+            >
+            <input
+              type="text"
+              id="title"
+              class="w-full p-2 border border-gray-300 rounded-sm"
+              required
+            />
+          </div>
+          <div class="mb-4">
+            <label for="content" class="block text-sm font-semibold mb-2"
+              >Content</label
+            >
+            <textarea
+              id="content"
+              class="w-full p-2 border border-gray-300 rounded-sm"
+              rows="5"
+              required
+            ></textarea>
+          </div>
+          <div class="mb-4">
+            <label for="image" class="block text-sm font-semibold mb-2"
+              >Upload Image</label
+            >
+            <input
+              type="file"
+              id="image"
+              class="w-full p-2 border border-gray-300 rounded-sm"
+            />
+          </div>
+          <div class="flex justify-end">
+            <button
+              type="button"
+              class="bg-red-500 text-white p-2 rounded-sm mr-2"
+              id="cancel-modal"
+            >
+              Cancel
+            </button>
+            <button type="submit" class="bg-blue-500 text-white p-2 rounded-sm">
+              Create Post
+            </button>
+          </div>
+        </form>
+      </div>
+    </div>
     <script type="module">
-      import { auth, signOut } from "./firebase.mjs";
+      import { auth, signOut, collection, addDoc, db } from "./firebase.mjs";
       let signOutButton = document.getElementById("sign-out");
       signOutButton.addEventListener("click", () => {
         signOut(auth)
           .then(() => {
-            // Sign-out successful.
             alert("Signed Out");
             window.location.href = "index.html";
-
           })
           .catch((error) => {
-            // An error happened.
             alert(error);
           });
       });
+      let generateBlog = document.getElementById("blog-create");
+      let modal = document.getElementById("create-blog-modal");
+      let cancelModal = document.getElementById("cancel-modal");
+
+      generateBlog.addEventListener("click", () => {
+        modal.classList.remove("hidden");
+      });
+
+      cancelModal.addEventListener("click", () => {
+        modal.classList.add("hidden");
+      });
+
+      document
+        .getElementById("blog-form")
+        .addEventListener("submit", async (e) => {
+          e.preventDefault();
+
+          let title = document.getElementById("title").value;
+          let content = document.getElementById("content").value;
+          let image = document.getElementById("image").files[0];
+
+          // Check if user is authenticated
+          const user = auth.currentUser;
+          if (user) {
+            try {
+              await addDoc(collection(db, "blogs"), {
+                uid: user.uid,
+                title: title,
+                content: content,
+                imageUrl: "",
+                createdAt: new Date(),
+              });
+              modal.classList.add("hidden");
+              document.getElementById("blog-form").reset();
+
+              Swal.fire({
+                title: "Blog added to firebase",
+                icon: "success",
+              });
+            } catch (error) {
+              console.error("Error adding document: ", error);
+              Swal.fire({
+                title: "Failed to create Blog post .Please try again",
+                icon: "error",
+              });
+            }
+          } else {
+            alert("You need to be signed in to create a blog post.");
+          }
+        });
     </script>
     <script src="index.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/sweetalert2@11"></script>
   </body>
 </html>

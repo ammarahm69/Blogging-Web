@@ -125,3 +125,9 @@ body {
 .btn:hover {
   border: 1px solid #2d79f3;
 }
+
+.size{
+  font-size: 18px !important;
+  border-radius: 10px !important;
+  font-weight: 600;
+}
