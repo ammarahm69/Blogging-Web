@@ -56,7 +56,11 @@
       </div>
     </div>
 
-    <!-- Modal -->
+    <div class="mt-72" id="show-post">
+      <!-- Show post -->
+    </div>
+
+    <!-- Modal Component -->
     <div
       id="create-blog-modal"
       class="fixed inset-0 bg-gray-600 bg-opacity-50 flex justify-center items-center hidden"
@@ -111,6 +115,7 @@
         </form>
       </div>
     </div>
+
     <script type="module">
       import { auth, signOut, collection, addDoc, db } from "./firebase.mjs";
       let signOutButton = document.getElementById("sign-out");
@@ -143,9 +148,8 @@
 
           let title = document.getElementById("title").value;
           let content = document.getElementById("content").value;
+          let showPost = document.getElementById("show-post");
           let image = document.getElementById("image").files[0];
-
-          // Check if user is authenticated
           const user = auth.currentUser;
           if (user) {
             try {
@@ -158,11 +162,24 @@
               });
               modal.classList.add("hidden");
               document.getElementById("blog-form").reset();
-
               Swal.fire({
-                title: "Blog added to firebase",
+                title: "Post created successfully",
                 icon: "success",
               });
+              showPost.innerHTML += `
+                <div class="flex items-center bg-gray-300 relative h-auto">
+        <img src="1.png" alt="" />
+        <h1 class="text-5xl absolute top-10 left-60">${title}</h1>
+        <p class="text-center">${content}</p>
+        <br />
+        <button
+         id="delete" class="mx-20 bg-red-500 p-3 rounded-lg mt-4 mx-2 tracking-widest text-sm font-semibold text-white"
+        >
+          Delete
+        </button>
+      </div>
+              
+              `;
             } catch (error) {
               console.error("Error adding document: ", error);
               Swal.fire({
